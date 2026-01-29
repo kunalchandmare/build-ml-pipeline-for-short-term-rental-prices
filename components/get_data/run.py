@@ -5,10 +5,19 @@ This script download a URL to a local destination
 import argparse
 import logging
 import os
+import sys
 
 import wandb
+# Calculate project root: get_data → components → root
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from wandb_utils.log_artifact import log_artifact
+# Add root to sys.path if not already there
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+# Now import – adjust based on exact location
+# Option A: if wandb_utils is components/wandb_utils.py or wandb_utils/__init__.py
+from components.wandb_utils.log_artifact import log_artifact
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()

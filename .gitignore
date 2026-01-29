@@ -113,3 +113,4 @@ mlruns/
 outputs/
 random_forest_dir/
 multirun/
+/src/eda/my_safe_artifacts/
