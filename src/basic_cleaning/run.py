@@ -11,13 +11,13 @@ import pandas as pd
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
+artifact_dir = os.path.join(os.getcwd(), "my_safe_artifacts")
 
 def safe_artifact_download_win(artifact):
     '''
     Safe way to download artifacts in windows as file path with ":" not accepted in windows. this function just updates local path with replacing ":" with "_"
     and saving it under "my_safe_artifacts" foldar in current dir instead temp
     '''
-    artifact_dir = os.path.join(os.getcwd(), "my_safe_artifacts")
     print(f"Downloaded to: {artifact_dir}")
     artifact_folder = artifact.name.replace(":", "_")
     local_path = os.path.join(artifact_dir, artifact_folder)
@@ -33,12 +33,12 @@ def go(args):
     # particular version of the artifact
     # artifact_local_path = run.use_artifact(args.input_artifact).file()
     artifact = wandb.use_artifact(args.input_artifact)
-    artifact_dir = safe_artifact_download_win(artifact)
+    artifact_inp_dir = safe_artifact_download_win(artifact)
 
-    csv_files = [f for f in os.listdir(artifact_dir) if f.lower().endswith('.csv')]
-    file_path = artifact_dir
+    csv_files = [f for f in os.listdir(artifact_inp_dir) if f.lower().endswith('.csv')]
+    file_path = artifact_inp_dir
     if len(csv_files) == 1:
-        file_path = os.path.join(artifact_dir, csv_files[0])
+        file_path = os.path.join(artifact_inp_dir, csv_files[0])
         df = pd.read_csv(file_path)
         print(f"Loaded: {csv_files[0]}  ({len(df)} rows)")
     else:
@@ -55,7 +55,7 @@ def go(args):
 
     # Convert last_review to datetime
     #df['last_review'] = pd.to_datetime(df['last_review'])
-    clean_csv_path = os.path.join(artifact_dir, "clean_sample.csv")
+    clean_csv_path = os.path.join(artifact_dir,"output", args.output_artifact)
     df.to_csv(clean_csv_path, index=False)
 
     artifact = wandb.Artifact(
