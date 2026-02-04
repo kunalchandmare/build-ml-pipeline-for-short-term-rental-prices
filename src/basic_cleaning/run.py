@@ -4,6 +4,7 @@ Download from W&B the raw dataset and apply some basic data cleaning, exporting 
 """
 import argparse
 import logging
+from pathlib import Path
 import wandb
 import os
 import pandas as pd
@@ -11,18 +12,53 @@ import pandas as pd
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
-artifact_dir = os.path.join(os.getcwd(), "my_safe_artifacts")
 
-def safe_artifact_download_win(artifact):
-    '''
-    Safe way to download artifacts in windows as file path with ":" not accepted in windows. this function just updates local path with replacing ":" with "_"
-    and saving it under "my_safe_artifacts" foldar in current dir instead temp
-    '''
-    print(f"Downloaded to: {artifact_dir}")
-    artifact_folder = artifact.name.replace(":", "_")
-    local_path = os.path.join(artifact_dir, artifact_folder)
-    artifact_local_dir = artifact.download(root=local_path)
-    return artifact_local_dir
+def safe_artifact_download_win(artifact, safe_root: str = "safe_artifacts") -> Path:
+    """
+    Safely downloads a wandb artifact on Windows by replacing ':' in names
+    and storing it in a dedicated folder under the current working directory.
+
+    Args:
+        artifact: wandb.Artifact object
+        safe_root: Name of the safe base folder (default: 'safe_artifacts')
+
+    Returns:
+        Path: Absolute path to the downloaded artifact directory
+
+    Raises:
+        ValueError: If artifact is invalid or download fails
+    """
+    if not isinstance(artifact, wandb.Artifact):
+        raise ValueError("Input must be a valid wandb.Artifact object")
+
+    # Get current working directory as base
+    cwd = Path.cwd()
+
+    # Create safe root folder if it doesn't exist
+    safe_base = cwd / safe_root
+    safe_base.mkdir(parents=True, exist_ok=True)
+
+    # Replace ':' with '_' in artifact name (Windows can't handle ':')
+    safe_name = artifact.name.replace(":", "_") if artifact.name else "unnamed_artifact"
+
+    # Final download location
+    target_dir = safe_base / safe_name
+
+    print(f"Downloading artifact '{artifact.name}' to: {target_dir}")
+
+    try:
+        # Download the artifact
+        downloaded_path = artifact.download(root=target_dir)
+
+        # Convert to absolute Path object
+        abs_path = Path(downloaded_path).resolve()
+
+        print(f"Successfully downloaded to: {abs_path}")
+        return abs_path
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to download artifact '{artifact.name}': {e}")
+
 
 def go(args):
 
