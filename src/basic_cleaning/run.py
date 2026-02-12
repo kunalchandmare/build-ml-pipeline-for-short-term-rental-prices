@@ -4,11 +4,23 @@ Download from W&B the raw dataset and apply some basic data cleaning, exporting 
 """
 import argparse
 import logging
+import pathlib
 from pathlib import Path
 import wandb
 import os
 import pandas as pd
 
+import shutil
+
+def empty_dir(dir_path: str) -> None:
+    p = Path(dir_path)
+    if not p.exists():
+        return
+    for child in p.iterdir():
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
@@ -59,6 +71,26 @@ def safe_artifact_download_win(artifact, safe_root: str = "safe_artifacts") -> P
     except Exception as e:
         raise RuntimeError(f"Failed to download artifact '{artifact.name}': {e}")
 
+def read_one_csv_to_df(artifact_inp_dir):
+    """Reads the single CSV file in the directory — fails gracefully if not exactly one."""
+    try:
+        csv_files = [f for f in os.listdir(artifact_inp_dir)
+                     if f.lower().endswith('.csv') and os.path.isfile(os.path.join(artifact_inp_dir, f))]
+
+        if len(csv_files) != 1:
+            msg = f"No CSV file found" if not csv_files else f"Found {len(csv_files)} CSVs — expected 1"
+            print(msg + (f": {csv_files}" if csv_files else ""))
+            return None
+
+        file_path = os.path.join(artifact_inp_dir, csv_files[0])
+        df = pd.read_csv(file_path)
+        print(f"Loaded: {csv_files[0]} ({len(df)} rows)")
+        return df
+
+    except Exception as e:
+        print(f"Error reading CSV from {artifact_inp_dir}: {e}")
+        return None
+
 
 def go(args):
 
@@ -69,20 +101,9 @@ def go(args):
     # particular version of the artifact
     # artifact_local_path = run.use_artifact(args.input_artifact).file()
     artifact = wandb.use_artifact(args.input_artifact)
-    artifact_inp_dir = safe_artifact_download_win(artifact)
+    artifact_inp_dir = safe_artifact_download_win(artifact,"my_safe_artifacts")
 
-    csv_files = [f for f in os.listdir(artifact_inp_dir) if f.lower().endswith('.csv')]
-    file_path = artifact_inp_dir
-    if len(csv_files) == 1:
-        file_path = os.path.join(artifact_inp_dir, csv_files[0])
-        df = pd.read_csv(file_path)
-        print(f"Loaded: {csv_files[0]}  ({len(df)} rows)")
-    else:
-        print(f"Found {len(csv_files)} CSV files — expected exactly 1")
-        if csv_files:
-            print("Files:", csv_files)
-        else:
-            print("No CSV file found")
+    df = read_one_csv_to_df(artifact_inp_dir)
 
     idx = df['price'].between(args.min_price, args.max_price)
 
@@ -91,7 +112,11 @@ def go(args):
 
     # Convert last_review to datetime
     #df['last_review'] = pd.to_datetime(df['last_review'])
-    clean_csv_path = os.path.join(artifact_inp_dir,"output", args.output_artifact)
+    my_safe_dir = pathlib.Path(artifact_inp_dir).parent
+    out_dir = my_safe_dir / "output"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    #out_dir = os.path.join(my_safe_dir, "output")
+    clean_csv_path = os.path.join(out_dir,args.output_artifact)
     df.to_csv(clean_csv_path, index=False)
 
     artifact = wandb.Artifact(
@@ -101,6 +126,7 @@ def go(args):
     )
     artifact.add_file(clean_csv_path)
     run.log_artifact(artifact)
+    empty_dir(my_safe_dir)
 
 if __name__ == "__main__":
 
