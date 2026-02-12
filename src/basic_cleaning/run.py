@@ -91,7 +91,7 @@ def go(args):
 
     # Convert last_review to datetime
     #df['last_review'] = pd.to_datetime(df['last_review'])
-    clean_csv_path = os.path.join(artifact_dir,"output", args.output_artifact)
+    clean_csv_path = os.path.join(artifact_inp_dir,"output", args.output_artifact)
     df.to_csv(clean_csv_path, index=False)
 
     artifact = wandb.Artifact(
