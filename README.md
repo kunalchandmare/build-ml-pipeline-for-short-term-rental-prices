@@ -1,25 +1,17 @@
 # Build an ML Pipeline for Short-Term Rental Prices in NYC
-You are working for a property management company renting rooms and properties for short periods of 
-time on various rental platforms. You need to estimate the typical price for a given property based 
-on the price of similar properties. Your company receives new data in bulk every week. The model needs 
-to be retrained with the same cadence, necessitating an end-to-end pipeline that can be reused.
+This projectis forked from Udacity Academic project and added missing component to complete the ML Pipeline and monitored on W&B in personal account
 
-In this project you will build such a pipeline.
+Objective: Working for a property management company renting rooms and properties for short periods of time on various rental platforms. Task is to estimate the typical price for a given property based 
+on the price of similar properties and new data is recieved in bulk every week. The model retrains with the same cadence, necessitating an end-to-end pipeline that can be reused.
+
+In this project which built such a reusable pipeline.
 W&B: https://wandb.ai/kunal-chandmare/nyc_airbnb
 Github: https://github.com/kunalchandmare/build-ml-pipeline-for-short-term-rental-prices
 
 ## Table of contents
 
 - [Introduction](#build-an-ML-Pipeline-for-Short-Term-Rental-Prices-in-NYC)
-- [Preliminary steps](#preliminary-steps)
-  * [Fork the Starter Kit](#fork-the-starter-kit)
-  * [Create environment](#create-environment)
-  * [Get API key for Weights and Biases](#get-api-key-for-weights-and-biases)
-  * [Cookie cutter](#cookie-cutter)
-  * [The configuration](#the-configuration)
-  * [Running the entire pipeline or just a selection of steps](#Running-the-entire-pipeline-or-just-a-selection-of-steps)
-  * [Pre-existing components](#pre-existing-components)
-- [Instructions](#instructions)
+- [Preliminary steps]
   * [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
   * [Data cleaning](#data-cleaning)
   * [Data testing](#data-testing)
@@ -39,9 +31,8 @@ Github: https://github.com/kunalchandmare/build-ml-pipeline-for-short-term-renta
 
 This project is compatible with the following operating systems:
 
-- **Ubuntu 22.04** (Jammy Jellyfish) - both Ubuntu installation and WSL (Windows Subsystem for Linux)
-- **Ubuntu 24.04** - both Ubuntu installation and WSL (Windows Subsystem for Linux)
-- **macOS** - compatible with recent macOS versions
+- Windows
+Note: Due to limitation on available Conda version and Network access , workaround was implemented for runtime environment creation, which shouold work without such workaround without such restrictions out of the boc
 
 Please ensure you are using one of the supported OS versions to avoid compatibility issues.
 
@@ -49,10 +40,8 @@ Please ensure you are using one of the supported OS versions to avoid compatibil
 
 This project requires **Python 3.13**. Please ensure that you have Python 3.13 installed and set as the default version in your environment to avoid any runtime issues.
 
-### Fork the Starter kit
-Go to [https://github.com/udacity/build-ml-pipeline-for-short-term-rental-prices.git](https://github.com/udacity/build-ml-pipeline-for-short-term-rental-prices.git)
-and click on `Fork` in the upper right corner. This will create a fork in your Github account, i.e., a copy of the
-repository that is under your control. Now clone the repository locally so you can start working on it:
+### The Starter kit
+Go to [(https://github.com/kunalchandmare/build-ml-pipeline-for-short-term-rental-prices)](https://github.com/kunalchandmare/build-ml-pipeline-for-short-term-rental-prices)
 
 ```
 git clone https://github.com/[your github username]/build-ml-pipeline-for-short-term-rental-prices.git
@@ -67,11 +56,11 @@ Commit and push to the repository often while you make progress towards the solu
 to add meaningful commit messages.
 
 ### Create environment
-Make sure to have conda installed and ready, then create a new environment using the ``environment.yml``
+Make sure to have conda installed and ready, then create a new environment using the ``merged_conda.yml``
 file provided in the root of the repository and activate it:
 
 ```bash
-> conda env create -f environment.yml
+> conda env create -f merged_conda.yml
 > conda activate nyc_airbnb_dev
 ```
 
