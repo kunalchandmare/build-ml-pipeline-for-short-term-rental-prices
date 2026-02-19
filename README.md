@@ -286,8 +286,10 @@ Went to Artifacts → located `random_forest_export` → added tag `prod`.
 In W&B → Artifacts → selected `prod`-tagged model → **Graph** view.
 
 Diagram displays complete flow:  
-download → cleaning → checks → split → training → model export
+download → cleaning → checks → split → training → model export 
 
+This ML Pipeline flow created after execution is shown as below
+![wandb_pipeline](images/wandb_pipeline.png "wandb_pipeline")
 
 ## License
 
